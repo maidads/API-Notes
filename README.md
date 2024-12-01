@@ -6,7 +6,8 @@ En API tjänst för att hantera användarens anteckningar.
 1. Klicka på "Import".
 2. Ladda upp filen Insomnia_testingAPI.json.
 3. Tryck på scan.
-4. Navigera till önskad endpoint och fyll i eventuella parametrar.
+4. Tryck på import.
+5. Navigera till önskad endpoint och fyll i eventuella parametrar.
 6. Klicka på **Send** för att testa endpointen.
 
 ## Endpoints
