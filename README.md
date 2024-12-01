@@ -16,12 +16,12 @@ Alla endpoints förutom skapa konto och logga in kräver att man är inloggad.
 
 | Endpoint         | Metod | Beskrivning            |
 |------------------|-------|------------------------|
-| `/api/notes`     | GET   | Hämta anteckningar    |
-| `/api/notes`     | POST  | Spara en anteckning   |
-| `/api/notes`     | PUT   | Ändra en anteckning   |
-| `/api/notes`     | DELETE| Ta bort en anteckning |
-| `/api/user/signup` | POST | Skapa konto          |
-| `/api/user/login`  | POST | Logga in             |
+| `/api/notes`     | GET   | Hämta anteckningar     |
+| `/api/notes`     | POST  | Spara en anteckning    |
+| `/api/notes`     | PUT   | Ändra en anteckning    |
+| `/api/notes`     | DELETE| Ta bort en anteckning  |
+| `/api/user/signup` | POST | Skapa konto           |
+| `/api/user/login`  | POST | Logga in              |
 
 ### Note - objekt
 
