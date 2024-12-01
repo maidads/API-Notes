@@ -41,7 +41,7 @@ Alla API-resurser returnerar JSON och/eller en HTTP statuskod:
 **400 (Bad request)** - Om requestet är felaktigt gjort, så att servern inte kan fortsätta. Exempel: Att frontend skickar med 
 felaktig data i body till servern.
 
-**401 (Unauthorized)** - Om giltig inloggning inte finns
+**401 (Unauthorized)** - Om giltig inloggning inte finns.
 
 **404 (Not found)** - Om resursen eller objektet som efterfrågas inte finns.
 
