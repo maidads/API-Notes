@@ -31,3 +31,18 @@ Alla endpoints förutom skapa konto och logga in kräver att man är inloggad.
 | `text`     | String  | Själva anteckningstexten, max 300 tecken.    |
 | `createdAt`| Date    | När anteckningen skapades.                   |
 | `modifiedAt`| Date   | När anteckningen sist modifierades.          |
+
+### Felhantering
+
+Alla API-resurser returnerar JSON och/eller en HTTP statuskod:
+
+**200 (OK)** - Om servern lyckats med att göra det som resursen motsvarar.
+
+**400 (Bad request)** - Om requestet är felaktigt gjort, så att servern inte kan fortsätta. Exempel: Att frontend skickar med 
+felaktig data i body till servern.
+
+**401 (Unauthorized)** - Om giltig inloggning inte finns
+
+**404 (Not found)** - Om resursen eller objektet som efterfrågas inte finns.
+
+**500 (internal server error)** - Om ett fel inträffar på servern. Använd catch för att fånga det.
