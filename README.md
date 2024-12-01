@@ -2,7 +2,7 @@
 
 En API tjänst för att hantera användarens anteckningar.
 
-## Testa API
+## Testa API:et i Insomnia
 1. Klicka på "Import".
 2. Ladda upp filen Insomnia_testingAPI.json.
 3. Tryck på scan.
