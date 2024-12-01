@@ -1,56 +1,95 @@
-const AWS = require('aws-sdk');
+import AWS from 'aws-sdk';
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 const TABLE_NAME = 'NotesTable';
 
-module.exports.getNotes = async () => {
-    console.log('Get Notes triggered');
-    try {
-        const params = {
-        TableName: TABLE_NAME,
-        };
-
-    const result = await dynamoDb.scan(params).promise();
-
-    if (!result.Items || result.Items.length === 0) {
-        return {
-        statusCode: 200,
-        body: JSON.stringify([]),
-        };
-    }
-
+const validateTitleLength = (title) => {
+  if (title.length > 50) {
     return {
-        statusCode: 200,
-        body: JSON.stringify(result.Items),
+      valid: false,
+      message: 'Title must be less than or equal to 50 characters',
     };
-    } catch (error) {
-        console.error('Error fetching notes:', error);
-        return {
-        statusCode: 500,
-        body: JSON.stringify({ message: "Internal Server Error", error: error.message }),
-    };
-    }
+  }
+  return { valid: true };
 };
 
-module.exports.addNote = async (event) => {
-    const { title, content } = JSON.parse(event.body);
-
-    if (!title || !content) {
+const validateTextLength = (text) => {
+  if (text.length > 300) {
     return {
-        statusCode: 400,
-        body: JSON.stringify({ message: 'Title and content are required' }),
+      valid: false,
+      message: 'Text must be less than or equal to 300 characters',
     };
-}
+  }
+  return { valid: true };
+};
 
-const params = {
+export const getNotes = async (userId) => {
+  const params = {
+    TableName: TABLE_NAME,
+    FilterExpression: 'userId = :userId',
+    ExpressionAttributeValues: { ':userId': userId },
+  };
+
+  try {
+    const result = await dynamoDb.scan(params).promise();
+    if (!result.Items || result.Items.length === 0) {
+      return {
+        statusCode: 404,
+        body: JSON.stringify({ message: 'No notes found for this user' }),
+      };
+    }
+    return {
+      statusCode: 200,
+      body: JSON.stringify(result.Items),
+    };
+  } catch (error) {
+    console.error('Error fetching notes:', error);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ message: 'Internal Server Error' }),
+    };
+  }
+};
+
+export const addNote = async (noteData) => {
+  const { title, text, userId } = noteData;
+
+  const titleValidation = validateTitleLength(title);
+  if (!titleValidation.valid) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ message: titleValidation.message }),
+    };
+  }
+
+  const textValidation = validateTextLength(text);
+  if (!textValidation.valid) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ message: textValidation.message }),
+    };
+  }
+
+  if (!title || !text) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ message: 'Title and text are required' }),
+    };
+  }
+
+  const timestamp = new Date().toISOString();
+  const params = {
     TableName: TABLE_NAME,
     Item: {
-      id: new Date().toISOString(),
-        title,
-        content,
+      id: timestamp,
+      title,
+      text,
+      userId,
+      createdAt: timestamp,
+      modifiedAt: timestamp,
     },
-};
+  };
 
-try {
+  try {
     await dynamoDb.put(params).promise();
     return {
       statusCode: 201,
@@ -65,29 +104,56 @@ try {
   }
 };
 
-module.exports.updateNote = async (event) => {
-  const { id, title, content } = JSON.parse(event.body);
+export const updateNote = async (noteData) => {
+  const { id, title, text, userId } = noteData;
 
-  if (!id || !title || !content) {
+  const titleValidation = validateTitleLength(title);
+  if (!titleValidation.valid) {
     return {
       statusCode: 400,
-      body: JSON.stringify({ message: 'ID, title, and content are required' }),
+      body: JSON.stringify({ message: titleValidation.message }),
+    };
+  }
+
+  const textValidation = validateTextLength(text);
+  if (!textValidation.valid) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ message: textValidation.message }),
+    };
+  }
+
+  if (!id || !title || !text) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ message: 'ID, title, and text are required' }),
     };
   }
 
   const params = {
     TableName: TABLE_NAME,
     Key: { id },
-    UpdateExpression: 'set title = :title, content = :content',
+    UpdateExpression: 'set #title = :title, #text = :text, modifiedAt = :modifiedAt',
+    ExpressionAttributeNames: {
+      '#title': 'title',
+      '#text': 'text',
+    },
     ExpressionAttributeValues: {
       ':title': title,
-      ':content': content,
+      ':text': text,
+      ':modifiedAt': new Date().toISOString(),
     },
     ReturnValues: 'ALL_NEW',
   };
 
   try {
     const result = await dynamoDb.update(params).promise();
+    if (!result.Attributes) {
+      return {
+        statusCode: 404,
+        body: JSON.stringify({ message: 'Note not found' }),
+      };
+    }
     return {
       statusCode: 200,
       body: JSON.stringify(result.Attributes),
@@ -101,9 +167,7 @@ module.exports.updateNote = async (event) => {
   }
 };
 
-module.exports.deleteNote = async (event) => {
-  const { id } = event.pathParameters;
-
+export const deleteNote = async (id, userId) => {
   if (!id) {
     return {
       statusCode: 400,
@@ -114,10 +178,20 @@ module.exports.deleteNote = async (event) => {
   const params = {
     TableName: TABLE_NAME,
     Key: { id },
+    ConditionExpression: 'userId = :userId',
+    ExpressionAttributeValues: {
+      ':userId': userId,
+    },
   };
 
   try {
-    await dynamoDb.delete(params).promise();
+    const result = await dynamoDb.delete(params).promise();
+    if (!result) {
+      return {
+        statusCode: 404,
+        body: JSON.stringify({ message: 'Note not found' }),
+      };
+    }
     return {
       statusCode: 200,
       body: JSON.stringify({ message: 'Note deleted successfully' }),

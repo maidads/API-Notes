@@ -8,6 +8,7 @@ provider:
   environment:
     USERS_TABLE: UsersTable
     NOTES_TABLE: NotesTable
+    JWT_SECRET: my-super-super-secret-key-12345
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -39,7 +40,7 @@ functions:
           cors: true
 
   getNotes:
-    handler: handlers.notes.getNotes
+    handler: handler.getNotes  
     events:
       - http:
           path: notes
@@ -47,7 +48,7 @@ functions:
           cors: true
 
   addNote:
-    handler: handlers.notes.addNote
+    handler: handler.addNote  
     events:
       - http:
           path: notes
@@ -55,7 +56,7 @@ functions:
           cors: true
 
   updateNote:
-    handler: handlers.notes.updateNote
+    handler: handler.updateNote 
     events:
       - http:
           path: notes
@@ -63,12 +64,13 @@ functions:
           cors: true
 
   deleteNote:
-    handler: handlers.notes.deleteNote
+    handler: handler.deleteNote 
     events:
       - http:
           path: notes/{id}
           method: delete
           cors: true
+
 
 resources:
   Resources:

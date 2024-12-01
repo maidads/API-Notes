@@ -2,10 +2,10 @@ import middy from '@middy/core';
 import { authenticate } from './middleware/auth.js';
 
 import {
-    addNote as addNoteToDb,
-    deleteNote as deleteNoteFromDb,
-    getNotes as getNotesFromDb,
-    updateNote as updateNoteInDb
+  addNote as addNoteToDb,
+  deleteNote as deleteNoteFromDb,
+  getNotes as getNotesFromDb,
+  updateNote as updateNoteInDb
 } from './functions/notes.js';
 
 const getNotesHandler = async (event) => {
@@ -31,7 +31,6 @@ const deleteNoteHandler = async (event) => {
   return await deleteNoteFromDb(id, userId); 
 };
 
-// Middy handler export
 export const getNotes = middy(getNotesHandler).use(authenticate());
 export const addNote = middy(addNoteHandler).use(authenticate());
 export const updateNote = middy(updateNoteHandler).use(authenticate());
