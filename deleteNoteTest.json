@@ -1,0 +1,15 @@
+{
+    "pathParameters": {
+      "id": "2024-12-01T21:14:46.925Z"
+    },
+    "headers": {
+      "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJpYXQiOjE3MzMwODgyMDgsImV4cCI6MTczMzA5MTgwOH0.dkYbvgo-0UEjUx_a959d8jcMFf29vB9HE980ywvLcqA"
+    },
+    "requestContext": {
+      "authorizer": {
+        "user": {
+          "email": "test@example.com"
+        }
+      }
+    }
+  }
